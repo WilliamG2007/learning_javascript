@@ -78,14 +78,41 @@ async function view_tasks() {
 }
 
 
+async function edit_task(task) {
+
+}
+
+async function delete_task(task) {
+    tasks.pop(task)
+}
+
 async function edit_tasks() {
     view_mode_display()
-    let task_search = await ask("Enter task name you wish to edit: ")
-    /*Finish ts */
+    let task_search = await ask("Enter name of task you wish to edit: ")
+    for (let task of tasks) {
+        if (task.name.toLowerCase() == task_search.toLowerCase()) {
+            console.log("Task: ", task);
+            console.log(`Enter preferred action:
+            1. Edit task
+            2. Delete task
+            3. Cancel`)
+            const edit_or_delete = await ask("> ")
+            if (edit_or_delete == 1) {
+                edit_task(task)
+                return
+            }
+            if (edit_or_delete == 2) {
+                delete_task(task)
+                return
+            }
+        }
+    }
+    console.log("No matching task found...")
 }
 
 
 async function menu() {
+    let i = 1
     console.log(`Chose on of the following actions
         1. Create new task
         2. View Tasks
@@ -103,7 +130,12 @@ async function menu() {
     if (choice == 3) {
         await edit_tasks()
     }
-    menu()
+    if (choice === "exit") {
+        i = 0
+    }
+    if (i == 1) {
+        menu()
+    }
 }
 
 function demo_tasks() {
@@ -115,9 +147,7 @@ function demo_tasks() {
 /*
 run to pre create a few tasks
 
-demo_tasks()
 */
+demo_tasks()
 
 menu()
-
-/*test commit*/
