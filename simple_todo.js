@@ -13,20 +13,40 @@ function ask(question) {
     });
 }
 
-function create_task(name, importance) {
+async function validate_input(name, importance) {
+    for (let task of tasks) {
+        if (task.name.toLowerCase() == name.toLowerCase()) {
+            return false
+        }
+        if (parseInt(importance, 10) > 11) {
+            return false
+        }
+        if (0 > parseInt(importance, 10)) {
+            return false
+        }
+    }
+    return true
+}
+
+async function create_task(name, importance) {
+    let valid = await validate_input(name, importance)
+    if (valid == false) {
+        console.log("Input not valid. Name each task differently and keep importance from 1 to 10")
+        return
+    }
     let task = {
         name: name,
         importance: importance,
         completed: false,
     }
     tasks.push(task)
-    console.log(task)
+    console.log("Task successfully created: \n", task)
 }
 
 function view_mode_display() {
     for (let i = 0; i < tasks.length; i++) {
         console.log(tasks[i]);
-    };
+    }
 }
 
 async function view_mode_search(keyword) {
@@ -35,7 +55,7 @@ async function view_mode_search(keyword) {
         if (tasks[i].name.toLowerCase().includes(keyword)) {
             console.log(tasks[i])
         }
-    };
+    }
 }
 
 function view_mode_order_name() {
@@ -79,11 +99,22 @@ async function view_tasks() {
 
 
 async function edit_task(task) {
-
+    let name = await ask("Enter new task name: ")
+    let importance = await ask("Enter new task importance")
+    let valid = await validate_input(name, importance)
+    console.log(valid)
+    if (valid == false) {
+        console.log("Input not valid. Name each task differently and keep importance from 1 to 10")
+        return
+    }
 }
 
 async function delete_task(task) {
-    tasks.pop(task)
+    console.log(task)
+    let index = tasks.findIndex(obj => obj === task)
+
+    tasks.splice(index, 1)
+    view_mode_display()
 }
 
 async function edit_tasks() {
@@ -98,11 +129,11 @@ async function edit_tasks() {
             3. Cancel`)
             const edit_or_delete = await ask("> ")
             if (edit_or_delete == 1) {
-                edit_task(task)
+                await edit_task(task)
                 return
             }
             if (edit_or_delete == 2) {
-                delete_task(task)
+                await delete_task(task)
                 return
             }
         }
